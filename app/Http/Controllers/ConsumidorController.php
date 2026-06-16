@@ -7,59 +7,63 @@ use Illuminate\Http\Request;
 
 class ConsumidorController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        // Busca todos os consumidores no banco e manda para a view index
+        $consumidores = Consumidor::all();
+        return view('consumidores.index', compact('consumidores'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        // Mostra a tela de cadastro
+        return view('consumidores.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        // Valida e salva no banco de dados
+        $request->validate([
+            'nome' => 'required|string|max:255',
+            'endereco' => 'required|string|max:255',
+            'telefone' => 'required|string|max:20',
+            'numero_medidor' => 'required|string|unique:consumidores',
+        ]);
+
+        Consumidor::create($request->all());
+
+        return redirect()->route('consumidores.index');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Consumidor $consumidor)
     {
-        //
+        // Não precisamos do show nesta prova
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Consumidor $consumidor)
     {
-        //
+        // Mostra a tela de edição
+        return view('consumidores.edit', compact('consumidor'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, Consumidor $consumidor)
     {
-        //
+        // Valida e atualiza no banco de dados
+        $request->validate([
+            'nome' => 'required|string|max:255',
+            'endereco' => 'required|string|max:255',
+            'telefone' => 'required|string|max:20',
+            'numero_medidor' => 'required|string|unique:consumidores,numero_medidor,' . $consumidor->id,
+        ]);
+
+        $consumidor->update($request->all());
+
+        return redirect()->route('consumidores.index');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Consumidor $consumidor)
     {
-        //
+        $consumidor->delete();
+        return redirect()->route('consumidores.index');
     }
 }

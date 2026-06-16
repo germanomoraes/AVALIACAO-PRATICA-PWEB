@@ -1,7 +1,10 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ConsumidorController;
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('consumidores.index');
 });
+
+Route::resource('consumidores', ConsumidorController::class);

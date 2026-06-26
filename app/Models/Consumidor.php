@@ -3,12 +3,18 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Consumidor extends Model
 {
-    // Avisa o Laravel qual o nome correto da tabela
+    use SoftDeletes;
+
     protected $table = 'consumidores';
-    
-    // Permite salvar esses dados
+
     protected $fillable = ['nome', 'endereco', 'telefone', 'numero_medidor'];
+
+    public function getRouteKeyName(): string
+    {
+        return 'id';
+    }
 }

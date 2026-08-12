@@ -13,11 +13,12 @@ class LeituraRequest extends FormRequest
     }
 
     public function rules(): array
-    {
-        return [
-            'consumidor_id' => 'required|integer|exists:consumidores,id',
-            'leitura_anterior' => 'required|numeric|min:0',
-            'leitura_atual' => 'required|numeric|min:0',
-        ];
-    }
-} 
+{
+    return [
+        'consumidor_id' => 'required|exists:consumidores,id',
+        'mes_referencia' => 'required|integer|min:1|max:12',
+        'ano_referencia' => 'required|integer|min:2000',
+        'leitura_atual' => 'required|numeric|min:0',
+    ];
+}
+}

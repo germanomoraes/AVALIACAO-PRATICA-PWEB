@@ -5,9 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Leitura;
 use App\Models\Consumidor;
 use App\Models\Fatura;
-use App\Models\ConfiguracaoTaxa;
+// Importamos o LeituraRequest que fará a validação
+use App\Http\Requests\LeituraRequest; 
 use App\Services\FaturaCalculatorService;
-use Illuminate\Http\Request;
 
 class LeituraController extends Controller
 {
@@ -27,27 +27,30 @@ class LeituraController extends Controller
         return view('leituras.create', compact('consumidores'));
     }
 
-    public function store(Request $request)
+    // 1. Trocamos Request genérico pelo LeituraRequest (Validação extraída)
+    public function store(LeituraRequest $request) 
     {
-        $request->validate([
-            'consumidor_id' => 'required|exists:consumidores,id',
-            'mes_referencia' => 'required|integer|min:1|max:12',
-            'ano_referencia' => 'required|integer|min:2000',
-            'leitura_atual' => 'required|numeric|min:0',
-        ]);
-
         // Busca última leitura do consumidor
         $ultimaLeitura = Leitura::where('consumidor_id', $request->consumidor_id)
             ->latest()->first();
 
         $leituraAnterior = $ultimaLeitura ? $ultimaLeitura->leitura_atual : 0;
 
-        // Validação: leitura atual não pode ser menor que a anterior
-        if ($request->leitura_atual < $leituraAnterior) {
+        // Instanciamos o Model com os dados validados e a leitura anterior
+        $leitura = new Leitura([
+            'consumidor_id' => $request->consumidor_id,
+            'mes_referencia' => $request->mes_referencia,
+            'ano_referencia' => $request->ano_referencia,
+            'leitura_anterior' => $leituraAnterior,
+            'leitura_atual' => $request->leitura_atual,
+        ]);
+
+        // 2. Usamos o método do Model para a regra de negócio (Regra extraída)
+        if (!$leitura->leituraValida()) {
             return back()->withErrors(['leitura_atual' => 'A leitura atual não pode ser menor que a anterior ('.$leituraAnterior.' m³).'])->withInput();
         }
 
-        // Verifica se já existe leitura nesse mês/ano para esse consumidor
+        // Verifica se já existe leitura nesse mês/ano
         $jaExiste = Leitura::where('consumidor_id', $request->consumidor_id)
             ->where('mes_referencia', $request->mes_referencia)
             ->where('ano_referencia', $request->ano_referencia)
@@ -57,25 +60,13 @@ class LeituraController extends Controller
             return back()->withErrors(['mes_referencia' => 'Já existe uma leitura para esse consumidor nesse mês/ano.'])->withInput();
         }
 
-        // Calcula consumo em m³
-        $consumo = $request->leitura_atual - $leituraAnterior;
+        // 3. Calcula consumo e salva
+        $consumo = $leitura->leitura_atual - $leitura->leitura_anterior;
+        $leitura->consumo_m3 = $consumo;
+        $leitura->save();
 
-        // Salva a leitura
-        $leitura = Leitura::create([
-            'consumidor_id' => $request->consumidor_id,
-            'mes_referencia' => $request->mes_referencia,
-            'ano_referencia' => $request->ano_referencia,
-            'leitura_anterior' => $leituraAnterior,
-            'leitura_atual' => $request->leitura_atual,
-            'consumo_m3' => $consumo,
-        ]);
-
-        // Calcula valor da fatura usando o Service
-        $config = ConfiguracaoTaxa::first();
-        $taxaFixa = $config ? $config->taxa_fixa : 25;
-        $valorExcedente = $config ? $config->valor_excedente : 2;
-
-        $valorTotal = $this->calculator->calcular($consumo, $taxaFixa, 10, $valorExcedente);
+        // 4. Delega cálculo da fatura para o Service (A regra mudou e agora está centralizada no Service)[cite: 1]
+        $valorTotal = $this->calculator->calcular($consumo);
 
         // Gera a fatura
         Fatura::create([
@@ -88,3 +79,4 @@ class LeituraController extends Controller
         return redirect()->route('faturas.index')->with('success', 'Leitura registrada e fatura gerada com sucesso!');
     }
 }
+

@@ -1,11 +1,11 @@
 # AVALIAÇÃO-PRATICA-PWEB
-# 💧 Sistema de Controle de Consumo de Água
+# Sistema de Controle de Consumo de Água
 
 Sistema web desenvolvido para substituir o processo manual de registro de consumo de água em uma associação comunitária. O leiturista registra as leituras mensais de cada medidor e o sistema calcula automaticamente o consumo e o valor da fatura de cada morador.
 
 ---
 
-## 👥 Dupla
+## Dupla / Integrantes
 
 | Nome | Curso | Turno | Semestre |
 |---|---|---|---|
@@ -17,19 +17,19 @@ Sistema web desenvolvido para substituir o processo manual de registro de consum
 
 ---
 
-## 🛠️ Tecnologias Utilizadas
+## Tecnologias Utilizadas
 
-- **PHP 8.x**
-- **Laravel 11.x**
+- **PHP 8.2**
+- **Laravel 12.x**
 - **MySQL 8.x**
+- **Docker** (para ambiente de produção)
+- **Railway** (hospedagem em nuvem)
+- **Vite** (para compilação de assets)
 - **Blade (Laravel Templating Engine)**
-- **Artisan CLI**
-- **Composer**
-- **HTML5 / CSS3 / Bootstrap**
 
 ---
 
-## 📋 Funcionalidades
+## Funcionalidades
 
 - **Cadastro de consumidores** — listar, cadastrar e editar (nome, endereço, número do medidor único e telefone)
 - **Registro de leitura mensal** — seleção do consumidor, mês/ano e leitura atual em m³; o sistema calcula o consumo automaticamente (`leitura atual − leitura anterior`)
@@ -45,7 +45,7 @@ Sistema web desenvolvido para substituir o processo manual de registro de consum
 
 ---
 
-## ⚙️ Como Instalar e Rodar o Projeto Localmente
+## Como Instalar e Rodar o Projeto Localmente
 
 ### Pré-requisitos
 
@@ -87,7 +87,7 @@ Acesse em: [http://localhost:8000](http://localhost:8000)
 
 ---
 
-## 🔧 Configuração do `.env`
+## Configuração do `.env`
 
 Abra o arquivo `.env` e ajuste as variáveis de banco de dados:
 
@@ -112,7 +112,7 @@ DB_PASSWORD=sua_senha_aqui
 
 ---
 
-## 🗄️ Migrations
+## Migrations
 
 As migrations foram geradas com o Artisan conforme exigido:
 
@@ -169,7 +169,7 @@ php artisan migrate
 
 ---
 
-## 💰 Regra de Cobrança
+## Regra de Cobrança
 
 | Consumo mensal | Cobrança |
 |---|---|
@@ -180,7 +180,7 @@ php artisan migrate
 
 ---
 
-## 📲 Bônus — Link WhatsApp
+## Bônus — Link WhatsApp
 
 Ao lado de cada fatura, um botão gera automaticamente um link para o WhatsApp do consumidor com a mensagem pré-preenchida:
 
@@ -197,18 +197,26 @@ O link segue o formato: `https://wa.me/55[telefone]?text=[mensagem codificada]`
 
 ---
 
-## 🔑 Usuário e Senha Padrão
+## Links do Projeto
 
-> *(Preencha caso o sistema possua autenticação)*
+* **Repositório GitHub:** [https://github.com/germanomoraes/AVALIACAO-PRATICA-PWEB]
+* **Aplicação Online (Railway):** [https://avaliacao-pratica-pweb-production.up.railway.app](https://avaliacao-pratica-pweb-production.up.railway.app)
 
-| Campo | Valor |
-|---|---|
-| E-mail | admin@agua.com |
-| Senha | password |
+## 🛠 Sobre a Configuração
+A aplicação foi desenvolvida com **Laravel 12** e utiliza os seguintes recursos de infraestrutura:
+* **Infraestrutura:** Deploy automatizado via Railway.
+* **Banco de Dados:** MySQL (configurado via variáveis de ambiente).
+* **Conteinerização:** Docker com suporte a PHP-FPM e Node.js para compilação de assets via Vite.
+
+## Instruções de Acesso
+Para testar as funcionalidades administrativas do sistema, utilize as credenciais abaixo:
+
+* **E-mail:** `admin@teste.com`
+* **Senha:** `12345678`
 
 ---
 
-## 📁 Estrutura do Projeto
+## Estrutura do Projeto
 
 ```
 ├── app/
@@ -241,7 +249,7 @@ O link segue o formato: `https://wa.me/55[telefone]?text=[mensagem codificada]`
 
 ---
 
-## 📝 Padrão de Commits (Conventional Commits)
+## Padrão de Commits (Conventional Commits)
 
 ```
 feat: cadastro de consumidores
@@ -257,10 +265,7 @@ migration: create_configuracoes_taxa_table
 docs: atualiza README com instruções de uso
 ```
 
+
 ---
 
-## 📌 Entrega
 
-- Repositório GitHub público
-- Link enviado pelo Google Classroom até **21h30**
-- Mínimo de **6 commits significativos** com mensagens descritivas

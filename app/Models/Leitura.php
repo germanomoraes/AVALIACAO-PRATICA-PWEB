@@ -24,4 +24,11 @@ class Leitura extends Model
     {
         return $this->hasOne(Fatura::class);
     }
+
+    // Comportamento obrigatório adicionado: verifica consistência da leitura
+    public function leituraValida(): bool
+    {
+        return $this->leitura_atual >= $this->leitura_anterior;
+    }
 }
+

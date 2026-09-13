@@ -1,3 +1,6 @@
+Substitua todo o conteúdo do seu arquivo index.blade.php pelo código abaixo. Eu já inseri a lógica do alerta amarelo (warning) de vazamento integrado ao design em Bootstrap que você está usando, logo abaixo do título:
+
+HTML
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -8,6 +11,12 @@
 <body class="container mt-4">
 
     <h2>Lista de Faturas</h2>
+
+    @if(session('warning'))
+        <div class="alert alert-warning fw-bold border-warning text-dark">
+            {{ session('warning') }}
+        </div>
+    @endif
 
     @if(session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>
@@ -76,3 +85,4 @@
 
 </body>
 </html>
+

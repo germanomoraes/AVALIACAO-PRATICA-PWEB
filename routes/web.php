@@ -6,9 +6,9 @@ use App\Http\Controllers\ConfiguracaoTaxaController;
 use App\Http\Controllers\LeituraController;
 use App\Http\Controllers\FaturaController;
 
-// Rota raiz — redireciona para login se não autenticado
+// Rota raiz — redireciona para a tela de login
 Route::get('/', function () {
-    return redirect()->route('consumidores.index');
+    return redirect()->route('login');
 });
 
 // Rotas protegidas por autenticação

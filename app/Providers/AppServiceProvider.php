@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Artisan;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -25,16 +27,20 @@ class AppServiceProvider extends ServiceProvider
             URL::forceScheme('https');
         }
 
-        // Garante a criação do banco de dados SQLite e executa as migrations no Docker
+        // Se o banco for SQLite, garante que o arquivo exista e roda as migrations
         if (config('database.default') === 'sqlite') {
             $dbPath = database_path('database.sqlite');
             if (!file_exists($dbPath)) {
-                touch($dbPath);
-                try {
-                    \Illuminate\Support\Facades\Artisan::call('migrate --force');
-                } catch (\Exception $e) {
-                    // Ignora se as tabelas já existirem
+                @touch($dbPath);
+            }
+
+            // Executa as migrations se a tabela principal 'users' ainda não existir
+            try {
+                if (!Schema::hasTable('users')) {
+                    Artisan::call('migrate', ['--force' => true]);
                 }
+            } catch (\Exception $e) {
+                // Previne crash de permissão temporária
             }
         }
     }

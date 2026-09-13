@@ -3,7 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\URL; // <--- Adicione esta linha no topo
+use Illuminate\Support\Facades\URL;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -20,9 +20,22 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Adicione estas linhas abaixo:
+        // Força HTTPS em ambiente de produção (Render)
         if ($this->app->environment('production')) {
             URL::forceScheme('https');
+        }
+
+        // Garante a criação do banco de dados SQLite e executa as migrations no Docker
+        if (config('database.default') === 'sqlite') {
+            $dbPath = database_path('database.sqlite');
+            if (!file_exists($dbPath)) {
+                touch($dbPath);
+                try {
+                    \Illuminate\Support\Facades\Artisan::call('migrate --force');
+                } catch (\Exception $e) {
+                    // Ignora se as tabelas já existirem
+                }
+            }
         }
     }
 }

@@ -20,10 +20,17 @@ COPY . .
 RUN composer install --no-dev --optimize-autoloader
 RUN npm install && npm run build
 
-# Cria a pasta database e o arquivo SQLite com permissão de escrita
-RUN mkdir -p /var/www/database && touch /var/www/database/database.sqlite
+# Cria os diretórios persistentes usados pelo Laravel e o arquivo SQLite
+RUN mkdir -p /var/www/database /var/www/storage/framework/sessions \
+    /var/www/storage/framework/cache /var/www/storage/framework/views \
+    && touch /var/www/database/database.sqlite
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache /var/www/database
 RUN chmod -R 777 /var/www/storage /var/www/database
 
-# Script de inicialização: roda as migrations e sobe o servidor
-CMD php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=${PORT:-8000}
+# Garante o estado mínimo também quando o Render monta um volume sobre /var/www
+CMD mkdir -p /var/www/database /var/www/storage/framework/sessions \
+    /var/www/storage/framework/cache /var/www/storage/framework/views \
+    && touch /var/www/database/database.sqlite \
+    && php artisan config:clear \
+    && php artisan migrate --force \
+    && php artisan serve --host=0.0.0.0 --port=${PORT:-8000}

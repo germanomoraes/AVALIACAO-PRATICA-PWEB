@@ -2,4 +2,3 @@ node_modules/
 .env
 .git
 storage/logs/*.log
-database/database.sqlite

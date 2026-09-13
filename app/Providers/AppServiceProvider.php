@@ -4,7 +4,6 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\URL;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Artisan;
 
 class AppServiceProvider extends ServiceProvider
@@ -22,26 +21,22 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Força HTTPS em ambiente de produção (Render)
+        // Garante a existência física do arquivo de banco de dados
+        $dbPath = database_path('database.sqlite');
+        if (!file_exists($dbPath)) {
+            @mkdir(dirname($dbPath), 0755, true);
+            @touch($dbPath);
+        }
+
         if ($this->app->environment('production')) {
             URL::forceScheme('https');
         }
 
-        // Se o banco for SQLite, garante que o arquivo exista e roda as migrations
-        if (config('database.default') === 'sqlite') {
-            $dbPath = database_path('database.sqlite');
-            if (!file_exists($dbPath)) {
-                @touch($dbPath);
-            }
-
-            // Executa as migrations se a tabela principal 'users' ainda não existir
-            try {
-                if (!Schema::hasTable('users')) {
-                    Artisan::call('migrate', ['--force' => true]);
-                }
-            } catch (\Exception $e) {
-                // Previne crash de permissão temporária
-            }
+        // Executa as migrations automaticamente
+        try {
+            Artisan::call('migrate', ['--force' => true]);
+        } catch (\Exception $e) {
+            // Ignora se as tabelas já existirem
         }
     }
 }
